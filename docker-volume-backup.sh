@@ -20,12 +20,12 @@ display_help() {
     echo "   --config=CONFIG               Path to JSON configuration file (default: credentials.json)"
     echo "   --prefix=PREFIX               Additional prefix for backup file names"
     echo "   --date                        Enable date prefix in backup file names"
-    echo "   --auto-upload                 Directly upload volumes without confirmation"
+    echo "   --preview                     Display list of volumes and sizes, and ask to proceed"
     echo "   -h, --help                    Display this help and usage information"
     echo
-    echo "Example: $0 --exclude=volume1,volume2 --minio-url=http://minio-server --access-key=access-key --secret-key=secret-key --bucket=bucket-name --prefix=my_prefix --date --auto-upload"
+    echo "Example: $0 --exclude=volume1,volume2 --minio-url=http://minio-server --access-key=access-key --secret-key=secret-key --bucket=bucket-name --prefix=my_prefix --date --preview"
     echo "or"
-    echo "Example: $0 --exclude=volume1,volume2 --config=config.json --bucket=bucket-name --prefix=my_prefix --date --auto-upload"
+    echo "Example: $0 --exclude=volume1,volume2 --config=config.json --bucket=bucket-name --prefix=my_prefix --date --preview"
 
     exit 0
 }
@@ -125,7 +125,7 @@ list_volumes_and_confirm() {
 
 # Function to start backup
 start_backup() {
-    if [ "$AUTO_UPLOAD" != true ]; then
+    if [ "$PREVIEW" == true ]; then
         list_volumes_and_confirm
     fi
 
@@ -173,8 +173,8 @@ case $i in
     display_help
     shift # past argument with no value
     ;;
-    --auto-upload)
-    AUTO_UPLOAD=true
+    --preview)
+    PREVIEW=true
     shift # past argument=value
     ;;
     *)

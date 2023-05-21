@@ -11,5 +11,5 @@ services:
       - ./credentials.json:/data/credentials.json
     restart: unless-stopped
     container_name: volume-backups
-    command: --minio-url=${MINIO_URL} --access-key=${MINIO_ACCESS_KEY} --secret-key=${MINIO_SECRET_KEY} --bucket=${MINIO_BUCKET} --auto-upload 
+    command: --minio-url=${MINIO_URL} --access-key=${MINIO_ACCESS_KEY} --secret-key=${MINIO_SECRET_KEY} --bucket=${MINIO_BUCKET}
     

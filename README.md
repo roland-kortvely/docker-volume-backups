@@ -20,7 +20,7 @@ The Docker Volume Backup Script is a shell script for Linux that allows you to b
 - `--config=CONFIG`: Path to JSON configuration file (default: credentials.json).
 - `--prefix=PREFIX`: Additional prefix for backup file names.
 - `--date`: Enable date prefix in backup file names.
-- `--auto-upload`: Directly upload volumes without confirmation.
+- `--preview`: Display list of volumes and sizes, and ask to proceed.
 - `-h, --help`: Display help and usage information.
 
 ### Examples
