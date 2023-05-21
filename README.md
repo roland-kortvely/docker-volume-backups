@@ -36,6 +36,23 @@ Backup volumes using a JSON configuration file:
 ./docker-volume-backup.sh --exclude=volume1,volume2 --config=config.json --bucket=bucket-name --prefix=my_prefix --date
 ```
 
+## Docker
+
+To build the Docker image, use the following command:
+```
+docker compose build
+```
+
+To run the script in a Docker container, use the following command:
+```
+MINIO_BUCKET=bucket-name docker-compose run --rm volume-backups
+```
+
+To run without credentials.json, use the following command to use ENV variables:
+```
+MINIO_BUCKET=bucket-name MINIO_URL=http://localhost:9000 MINIO_ACCESS_KEY=access-key MINIO_SECRET_KEY=secret-key docker-compose run --rm volume-backups
+```
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).

@@ -185,16 +185,14 @@ esac
 done
 
 # If a configuration file is not specified, set it to the default
-if [ -z "$CONFIG" ]; then
-    CONFIG="credentials.json"
+if [ -z "$MINIO_URL" ] || [ -z "$ACCESS_KEY" ] || [ -z "$SECRET_KEY" ]; then
+    if [ -z "$CONFIG" ]; then
+        CONFIG="credentials.json"
+    fi
 fi
 
-# If a configuration file is specified, validate if jq is installed
 if [ -n "$CONFIG" ]; then
     validate_jq_installation
-fi
-
-if [ -n "$CONFIG" ]; then
     if [ ! -f "$CONFIG" ]; then
         echo "Configuration file $CONFIG not found."
         exit 1
