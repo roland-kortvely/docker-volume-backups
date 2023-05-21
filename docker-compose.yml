@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  volume-backups:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp:/tmp
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./credentials.json:/data/credentials.json
+    restart: unless-stopped
+    container_name: volume-backups
+    command: --bucket=backups --auto-upload
+    
