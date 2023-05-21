@@ -53,6 +53,18 @@ To run without credentials.json, use the following command to use ENV variables:
 MINIO_BUCKET=bucket-name MINIO_URL=http://localhost:9000 MINIO_ACCESS_KEY=access-key MINIO_SECRET_KEY=secret-key docker-compose run --rm volume-backups
 ```
 
+To run without compose, use the following command:
+```
+docker run --rm \
+  -v /tmp:/tmp \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  rolandkortvely/docker-volume-backup \
+  --minio-url=http://localhost:9000 \
+  --access-key=secret-key \
+  --secret-key=secret-key \
+  --bucket=bucket-name
+```
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
