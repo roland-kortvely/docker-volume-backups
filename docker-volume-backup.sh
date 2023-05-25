@@ -95,8 +95,9 @@ backup_volumes() {
 
         BACKUP_FILE="${FILENAME_PREFIX}$volume.tar.gz"
 
+        echo "Backing up volume $volume to local file system as $BACKUP_FILE..."
         docker run --rm -v $volume:/volume -v /tmp:/backup alpine tar -czf /backup/$BACKUP_FILE -C /volume ./
-        echo "Backing up volume $volume..."
+        echo "Backing up volume $volume to MinIO..."
         mc cp /tmp/$BACKUP_FILE myminio/$BUCKET/$BACKUP_FILE
 
         echo "Backup of volume $volume completed. Backup file name: $BACKUP_FILE"

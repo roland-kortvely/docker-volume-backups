@@ -31,9 +31,13 @@ Backup volumes with MinIO access parameters specified directly:
 ```
 
 Backup volumes using a JSON configuration file:
-
 ```
 ./docker-volume-backup.sh --exclude=volume1,volume2 --config=config.json --bucket=bucket-name --prefix=my_prefix --date
+```
+
+Example credentials JSON:
+```
+{"url":"http://127.0.0.1:9000","accessKey":"access-key","secretKey":"secret-key"}
 ```
 
 ## Docker
