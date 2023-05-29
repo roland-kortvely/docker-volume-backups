@@ -16,12 +16,17 @@
 display_help() {
     echo "Usage: $0 [options...] (--minio-url=URL --access-key=KEY --secret-key=KEY --bucket=BUCKET | --config=CONFIG --bucket=BUCKET)"
     echo
-    echo "   --exclude=vol1,vol2,vol3      Exclude specified volumes from backup"
-    echo "   --config=CONFIG               Path to JSON configuration file (default: credentials.json)"
-    echo "   --prefix=PREFIX               Additional prefix for backup file names"
-    echo "   --date                        Enable date prefix in backup file names"
-    echo "   --preview                     Display list of volumes and sizes, and ask to proceed"
-    echo "   -h, --help                    Display this help and usage information"
+    echo "   --exclude=vol1,vol2,vol3           Exclude specified volumes from backup"
+    echo "   --exclude-labels=label1,label2     Exclude volumes with specified labels from backup"
+    echo "   --minio-url=URL                    MinIO server URL"
+    echo "   --access-key=KEY                   MinIO server access key"
+    echo "   --secret-key=KEY                   MinIO server secret key"
+    echo "   --bucket=BUCKET                    MinIO bucket name"
+    echo "   --config=CONFIG                    Path to JSON configuration file (default: credentials.json)"
+    echo "   --prefix=PREFIX                    Additional prefix for backup file names"
+    echo "   --date                             Enable date prefix in backup file names"
+    echo "   --preview                          Display list of volumes and sizes, and ask to proceed"
+    echo "   -h, --help                         Display this help and usage information"
     echo
     echo "Example: $0 --exclude=volume1,volume2 --minio-url=http://minio-server --access-key=access-key --secret-key=secret-key --bucket=bucket-name --prefix=my_prefix --date --preview"
     echo "or"
@@ -76,11 +81,36 @@ setup_mc_alias() {
     mc alias set myminio $MINIO_URL $ACCESS_KEY $SECRET_KEY --api S3v4
 }
 
+# Function to get volume label keys
+get_volume_label_keys() {
+    local volume=$1
+    volume_labels=$(docker volume inspect $volume --format '{{json .Labels}}')
+    
+    # If the volume doesn't have any labels, return an empty array
+    if [[ "$volume_labels" == "null" ]]; then
+        echo "[]"
+    else
+        echo $volume_labels | jq -r 'keys[]'
+    fi
+}
+
+# Function to check if volume has any of the excluded labels
+volume_has_excluded_label() {
+    local volume_label_keys=$1
+    for exclude_label in "${EXCLUDE_LABELS[@]}"; do
+        if [[ " ${volume_label_keys[@]} " =~ " ${exclude_label} " ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 # Function to backup volumes
 backup_volumes() {
     echo "Starting backup process..."
     for volume in $(docker volume ls -q); do
-        if [[ " ${EXCLUDES[@]} " =~ " ${volume} " ]]; then
+        local volume_labels=$(get_volume_label_keys $volume)
+        if [[ " ${EXCLUDES[@]} " =~ " ${volume} " ]] || volume_has_excluded_label "$volume_labels"; then
             continue
         fi
 
@@ -108,7 +138,8 @@ backup_volumes() {
 list_volumes_and_confirm() {
     echo "Listing volumes and their sizes..."
     for volume in $(docker volume ls -q); do
-        if [[ " ${EXCLUDES[@]} " =~ " ${volume} " ]]; then
+       local volume_labels=$(get_volume_labels $volume)
+        if [[ " ${EXCLUDES[@]} " =~ " ${volume} " ]] || volume_has_excluded_label "$volume_labels"; then
             continue
         fi
 
@@ -166,6 +197,10 @@ case $i in
     PREFIX="${i#*=}"
     shift # past argument=value
     ;;
+    --exclude-labels=*)
+    EXCLUDE_LABELS_ARG="${i#*=}"
+    shift # past argument=value
+    ;;
     --date)
     DATE=true
     shift # past argument=value
@@ -218,6 +253,9 @@ DEFAULT_EXCLUDES=("minio")
 
 # Merge both excluded arrays
 EXCLUDES=(${EXCLUDES_ARG//,/ } ${DEFAULT_EXCLUDES[@]})
+
+# Exclude volumes with specified labels
+EXCLUDE_LABELS=(${EXCLUDE_LABELS_ARG//,/ })
 
 # If DATE is not set, do not generate a date prefix
 if [ "$DATE" != true ]; then

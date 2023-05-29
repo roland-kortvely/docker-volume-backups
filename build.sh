@@ -9,6 +9,8 @@
 image_name="rolandkortvely/docker-volume-backup"
 dockerfile_path="Dockerfile"
 
+set -e
+
 # Store the current directory
 current_dir=$(pwd)
 
